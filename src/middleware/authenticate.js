@@ -8,7 +8,7 @@ const authenticate = (req, res, next) => {
       if (error) {
         res.status(401).json({ message: 'Unable to authenticate token' });
       } else {
-        req.authorizer = { id: authorizer.id };
+        req.authorizer = { id: authorizer._id };
         next();
       }
     });
