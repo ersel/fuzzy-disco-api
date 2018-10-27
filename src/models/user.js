@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     set: password => bcrypt.hashSync(password, 10),
   },
+  expoPushToken: String,
 });
 
 userSchema.methods.validatePassword = function validatePassword(password) {
