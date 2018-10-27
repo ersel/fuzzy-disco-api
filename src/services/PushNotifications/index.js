@@ -1,7 +1,9 @@
-const Expo = require('expo-server-sdk');
+const { Expo } = require('expo-server-sdk');
 
 // Create a new Expo SDK client
 let expo = new Expo();
+
+somePushTokens = ['ExponentPushToken[lwQsItFGCFyEuUNWz2aKQJ]']
 
 // Create the messages that you want to send to clients
 let messages = [];
