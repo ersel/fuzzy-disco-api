@@ -7,6 +7,4 @@ router.route('/')
   .get(UsersController.index)
   .post(UsersController.create);
 
-router.route('/push-token').put(UsersController.savePushToken)
-
 module.exports = router;

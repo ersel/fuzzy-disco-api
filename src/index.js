@@ -5,7 +5,7 @@ const dotenv = require('dotenv');
 const expressListRoutes   = require('express-list-routes');
 const router = express.Router();
 
-const { auth, users, secrets } = require('./routes');
+const { auth, users, secrets, pushToken } = require('./routes');
 const authenticate = require('./middleware/authenticate');
 
 dotenv.config();
@@ -17,6 +17,7 @@ app.use(cors());
 
 router.use('/auth', auth);
 router.use('/users', users);
+router.use('/users', authenticate, pushToken);
 router.use('/secrets', authenticate, secrets);
 app.use(router);
 
