@@ -17,7 +17,8 @@
     "nodemon": "^1.17.5"
   },
   "scripts": {
-    "start": "nodemon src/index.js"
+    "dev": "nodemon src/index.js",
+    "start": "node src/index.js"
   },
   "author": "The Professors",
   "license": "ISC"
