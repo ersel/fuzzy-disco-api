@@ -22,8 +22,9 @@ const create = (req, res) => {
 
   user.save()
     .then((data) => {
-      jwt.sign(data, process.env.JWT_SECRET, { expiresIn: '48h' }, (err, token) => {
+      jwt.sign(data.toObject(), process.env.JWT_SECRET, { expiresIn: '48h' }, (err, token) => {
         if (err) {
+          console.log(err)
           res.sendStatus(500);
         } else {
           res.status(200).json({ token }); 
