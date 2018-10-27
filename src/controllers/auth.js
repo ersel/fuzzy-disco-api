@@ -10,14 +10,7 @@ const login = (req, res) => {
         });
       } else {
         if (user.validatePassword(req.body.password)) {
-          const payload = {
-            id: user._id,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            email: user.email,
-          };
-          
-          jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '48h' }, (err, token) => {
+          jwt.sign(user.toObject(), process.env.JWT_SECRET, { expiresIn: '48h' }, (err, token) => {
             if (err) {
               res.sendStatus(500);
             } else {
