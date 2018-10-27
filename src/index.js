@@ -29,7 +29,8 @@ router.stack.forEach(r => {
 
 mongoose.connect(process.env.DATABASE_URL, () => {
   console.log('connected to database');
-  app.listen(3000, () => {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
     console.log('server listening on http://127.0.0.1:3000');
   });
 });
