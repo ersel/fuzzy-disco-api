@@ -1,12 +1,19 @@
 const axios = require('axios');
 const moment = require('moment');
 const Journey = require('../models/journey');
+const stations = require('../stations');
 
 axios.defaults.baseURL = 'http://transportapi.com/v3/uk';
 
 const generateRequestURI = ({ start, end, operator }) => (
   `/train/station/${start}/live.json?calling_at=${end}&operator=${operator}&type=departure&app_id=${process.env.TRANSPORT_API_APP_ID}&app_key=${process.env.TRANSPORT_API_KEY}`
 );
+
+const generateAlternateRequestURI = ({ start, end }) => {
+  const startStation = stations.find(station => station.code === start);
+  const endStation = stations.find(station => station.code === end);
+  return `public/journey/from/lonlat:${startStation.lon},${startStation.lat}/to/lonlat:${endStation.lon},${endStation.lat}.json?app_id=${process.env.TRANSPORT_API_APP_ID}&app_key=${process.env.TRANSPORT_API_KEY}&not_modes=train`
+};
 
 const index = (req, res) => {
   const now = moment().utc();
@@ -32,20 +39,29 @@ const find = (req, res) => Journey.findOne({ userId: req.authorizer.id, _id: req
       return res.sendStatus(404);
     }
     return axios.get(generateRequestURI(journey))
-      .then((response) => {
-        const departure = response.data.departures.all
-          .find(d => d.aimed_departure_time === moment.unix(journey.time).format('HH:mm'));
-
-        res.status(200).json({
-          ...journey.toObject(),
-          ...departure && {
-            departure: {
-              platform: departure.platform,
-              operator: departure.operator_name,
-              status: departure.status,
-              expectedDeparture: departure.expected_departure_time,
+      .then(response => response.data.departures.all.find(d => d.aimed_departure_time === moment.unix(journey.time).format('HH:mm')))
+      .then((departure) => {
+        axios.get(generateAlternateRequestURI(journey)).then((alternate) => {
+          console.log(alternate)
+          res.status(200).json({
+            ...journey.toObject(),
+            ...departure && {
+              departure: {
+                platform: departure.platform,
+                operator: departure.operator_name,
+                status: departure.status,
+                expectedDeparture: departure.expected_departure_time,
+              },
             },
-          },
+            alternateRoutes: alternate.routes.map(route => ({
+              duration: route.duration,
+              departureTime: route.departure_time,
+              arrivalTime: route.arrival_time,
+              modes: route.routeParts.map(part => part.mode).filter((mode, index, arr)=> arr.indexOf(mode) === index),
+              from: route.routeParts[0].from_point_name,
+              to: route.routeParts[route.routeParts.length - 1].to_point_name,
+            }));
+          });
         });
       });
   })
