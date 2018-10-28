@@ -1,4 +1,4 @@
-export default [
+module.exports = [
   { name: 'Alliance Rail', code: 'AR' },
   { name: 'Arriva Trains Wales', code: 'AW' },
   { name: 'c2c HT', code: 'CC' },

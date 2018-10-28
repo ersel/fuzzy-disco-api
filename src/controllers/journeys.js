@@ -10,7 +10,7 @@ const generateRequestURI = ({ start, end, operator }) => (
 
 const index = (req, res) => {
   const now = moment().utc();
-  return Journey.find({ userId: req.authorizer.id, time: { $gt: now.subtract(3, 'hours').utc().unix() } })
+  return Journey.find({ userId: req.authorizer.id, time: { $gt: now.subtract(90, 'minutes').utc().unix() } })
     .then(journeys => Promise.all(journeys.map(generateRequestURI))
       .then(URIs => Promise.all(URIs.map(axios.get)))
       .then((responses) => {
@@ -33,7 +33,6 @@ const find = (req, res) => Journey.findOne({ userId: req.authorizer.id, _id: req
     }
     return axios.get(generateRequestURI(journey))
       .then((response) => {
-        console.log(response.data.departures.all);
         const departure = response.data.departures.all
           .find(d => d.aimed_departure_time === moment.unix(journey.time).format('HH:mm'));
 

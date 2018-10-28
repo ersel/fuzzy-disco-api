@@ -1,4 +1,4 @@
-export default [
+module.exports = [
   {
     name: 'Altrincham',
     code: 'ALT',
