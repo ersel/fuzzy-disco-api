@@ -2,7 +2,7 @@ const auth = require('./auth');
 const users = require('./users');
 const journeys = require('./journeys');
 const pushToken = require('./pushToken');
-const sendSMS = require('./sendSms');
+const sendSMS = require('./sendSMS');
 
 module.exports = {
   auth,
