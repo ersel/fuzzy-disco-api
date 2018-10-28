@@ -42,7 +42,6 @@ const find = (req, res) => Journey.findOne({ userId: req.authorizer.id, _id: req
       .then(response => response.data.departures.all.find(d => d.aimed_departure_time === moment.unix(journey.time).format('HH:mm')))
       .then((departure) => {
         axios.get(generateAlternateRequestURI(journey)).then((alternate) => {
-          console.log(alternate)
           res.status(200).json({
             ...journey.toObject(),
             ...departure && {
@@ -53,7 +52,7 @@ const find = (req, res) => Journey.findOne({ userId: req.authorizer.id, _id: req
                 expectedDeparture: departure.expected_departure_time,
               },
             },
-            alternateRoutes: alternate.routes.map(route => ({
+            alternateRoutes: alternate.data.routes.map(route => ({
               duration: route.duration,
               departureTime: route.departure_time,
               arrivalTime: route.arrival_time,
