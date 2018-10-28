@@ -5,7 +5,7 @@ const dotenv = require('dotenv');
 const expressListRoutes   = require('express-list-routes');
 const router = express.Router();
 
-const { auth, users, secrets, pushToken } = require('./routes');
+const { auth, users, journeys, pushToken } = require('./routes');
 const authenticate = require('./middleware/authenticate');
 
 dotenv.config();
@@ -18,14 +18,13 @@ app.use(cors());
 router.use('/auth', auth);
 router.use('/users', users);
 router.use('/users', authenticate, pushToken);
-router.use('/secrets', authenticate, secrets);
+router.use('/journeys', authenticate, journeys);
 app.use(router);
 
 router.stack.forEach(r => {
   const prefix = r.regexp.toString().replace(/\W/g, '').slice(0, -1)
   expressListRoutes({ prefix: `${prefix}` }, '', r.handle);
 })
-
 
 mongoose.connect(process.env.DATABASE_URL, () => {
   console.log('connected to database');
