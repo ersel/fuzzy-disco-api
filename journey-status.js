@@ -35,20 +35,26 @@ module.exports.handler = async () => {
         const departure = departures.find(isLateOrBus(scheduledDepartureString));
         const user = await User.findById(journey.userId);
         if (departure.status === 'LATE') {
+          const body = `Heads Up! Your ${scheduledDepartureString} train from ${station} to ${stations.find(s => s.code === journey.end).name} is delayed.
+          The new departure time is ${departure.expected_departure_time}.
+          We have some alternate routes to get you there in a jiffy 🔥`;
           return {
             to: user.expoPushToken,
-            title: '⏰ Delayed Journey!',
+            title: '⏰  Delayed Journey!',
+            body,
             data: {
-              body: `Your ${scheduledDepartureString} train from ${station} to ${stations.find(s => s.code === journey.end).name} is delayed. The new departure time is ${departure.expected_departure_time}`,
+              body,
             },
           };
         }
-
+        const body = `Heads up! Your ${scheduledDepartureString} train from ${station} to ${stations.find(s => s.code === journey.end).name} has been replaced with a bus service!
+        We have some alternate routes to get you there in a flash ⚡`;
         return {
           to: user.expoPushToken,
-          title: '🚌 Rail Replacement Bus!',
+          title: '🚌  Rail Replacement Bus!',
+          body,
           data: {
-            body: `Your ${scheduledDepartureString} train from ${station} to ${stations.find(s => s.code === journey.end).name} has been replaced with a bus service!`,
+            body,
           },
         };
       }
