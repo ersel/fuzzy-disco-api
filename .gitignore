@@ -1,8 +1,9 @@
-node_modules/
-<<<<<<< HEAD
+# package directories
+node_modules
+jspm_packages
+
+# Serverless directories
+.serverless
+.env
+env.yml
 .DS_Store
-*.log
-.env
-=======
-.env
->>>>>>> correct branch

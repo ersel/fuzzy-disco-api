@@ -1,0 +1,18 @@
+service: fuzzy-disco
+
+frameworkVersion: "=1.30.3"
+
+provider:
+  name: aws
+  region: eu-west-1
+  runtime: nodejs8.10
+
+functions:
+  checkJourneyStatus:
+    handler: journey-status.handler
+    events:
+      - schedule: rate(10 minutes)
+    environment:
+      DATABASE_URL: ${file(env.yml):DATABASE_URL}
+      TRANSPORT_API_APP_ID: ${file(env.yml):TRANSPORT_API_APP_ID}
+      TRANSPORT_API_KEY: ${file(env.yml):TRANSPORT_API_KEY}
