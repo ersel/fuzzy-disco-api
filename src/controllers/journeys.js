@@ -42,26 +42,25 @@ const find = (req, res) => Journey.findOne({ userId: req.authorizer.id, _id: req
       .then(response => response.data.departures.all.find(d => d.aimed_departure_time === moment.unix(journey.time).format('HH:mm')))
       .then((departure) => {
         axios.get(generateAlternateRequestURI(journey)).then((alternate) => {
-          res.status(200).json({
+          console.log(alternate.data);
+          return {
             ...journey.toObject(),
-            ...departure && {
-              departure: {
-                platform: departure.platform,
-                operator: departure.operator_name,
-                status: departure.status,
-                expectedDeparture: departure.expected_departure_time,
-              },
+          ...departure && {
+            departure: {
+              platform: departure.platform,
+              operator: departure.operator_name,
+              status: departure.status,
+              expectedDeparture: departure.expected_departure_time,
             },
-            alternateRoutes: alternate.data.routes.map(route => ({
-              duration: route.duration,
-              departureTime: route.departure_time,
-              arrivalTime: route.arrival_time,
-              modes: route.routeParts.map(part => part.mode).filter((mode, index, arr)=> arr.indexOf(mode) === index),
-              from: route.routeParts[0].from_point_name,
-              to: route.routeParts[route.routeParts.length - 1].to_point_name,
-            })),
-          });
-        });
+          },
+          alternateRoutes: alternate.data.routes.map(route => ({
+            duration: route.duration,
+            departureTime: route.departure_time,
+            arrivalTime: route.arrival_time,
+            modes: route.route_parts.map(part => part.mode).filter((mode, index, arr) => arr.indexOf(mode) === index),
+          })),
+          };
+        }).then(payload => res.status(200).json(payload));
       });
   })
   .catch((error) => {
