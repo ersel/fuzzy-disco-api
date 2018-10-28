@@ -60,7 +60,7 @@ const find = (req, res) => Journey.findOne({ userId: req.authorizer.id, _id: req
               modes: route.routeParts.map(part => part.mode).filter((mode, index, arr)=> arr.indexOf(mode) === index),
               from: route.routeParts[0].from_point_name,
               to: route.routeParts[route.routeParts.length - 1].to_point_name,
-            }));
+            })),
           });
         });
       });
