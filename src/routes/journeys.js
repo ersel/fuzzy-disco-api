@@ -7,4 +7,7 @@ router.route('/')
   .get(JourneysController.index)
   .post(JourneysController.create);
 
+router.route('/:id')
+  .get(JourneysController.find);
+
 module.exports = router;

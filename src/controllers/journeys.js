@@ -1,5 +1,6 @@
-const Journey = require('../models/journey');
 const axios = require('axios');
+const moment = require('moment');
+const Journey = require('../models/journey');
 
 axios.defaults.baseURL = 'http://transportapi.com/v3/uk';
 
@@ -7,27 +8,52 @@ const generateRequestURI = ({ start, end, operator }) => (
   `/train/station/${start}/live.json?calling_at=${end}&operator=${operator}&type=departure&app_id=${process.env.TRANSPORT_API_APP_ID}&app_key=${process.env.TRANSPORT_API_KEY}`
 );
 
-const isLate = time => departure => departure.aimed_departure_time === time && departure.status === 'LATE';
-const filterNulls = d => d.filter(x => x !== null)
-
 const index = (req, res) => {
-  return Journey.find({ userId: req.authorizer.id })
-    .then((journeys) => {
-      return Promise.all(journeys.map(generateRequestURI)).then(URIs => 
-        Promise.all(URIs.map(axios.get))
-      ).then(responses => {
+  const now = moment().utc();
+  return Journey.find({ userId: req.authorizer.id, time: { $gt: now.subtract(3, 'hours') } })
+    .then(journeys => Promise.all(journeys.map(generateRequestURI))
+      .then(URIs => Promise.all(URIs.map(axios.get)))
+      .then((responses) => {
         const results = responses.map((response, idx) => ({
           ...response.data,
-          ...journeys[idx].toObject()
-        }))
-        res.status(200).json(results)
-      }).catch(e => console.log(e))
-    })
+          ...journeys[idx].toObject(),
+        }));
+        res.status(200).json(results);
+      }))
     .catch((error) => {
       console.log(error);
       res.sendStatus(500);
     });
 };
+
+const find = (req, res) => Journey.findOne({ userId: req.authorizer.id, _id: req.params.id })
+  .then((journey) => {
+    if (journey === null) {
+      return res.sendStatus(404);
+    }
+    return axios.get(generateRequestURI(journey))
+      .then((response) => {
+        console.log(response.data.departures.all);
+        const departure = response.data.departures.all
+          .find(d => d.aimed_departure_time === moment.unix(journey.time).format('HH:mm'));
+
+        res.status(200).json({
+          ...journey.toObject(),
+          ...departure && {
+            departure: {
+              platform: departure.platform,
+              operator: departure.operator_name,
+              status: departure.status,
+              expectedDeparture: departure.expected_departure_time,
+            },
+          },
+        });
+      });
+  })
+  .catch((error) => {
+    console.log(error);
+    res.sendStatus(500);
+  });
 
 const create = (req, res) => {
   const journey = new Journey({
@@ -50,5 +76,6 @@ const create = (req, res) => {
 
 module.exports = {
   index,
+  find,
   create,
 };

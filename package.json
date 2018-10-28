@@ -26,7 +26,7 @@
     "start": "node src/index.js",
     "clean": "docker rm --force $(docker ps -a -q --filter ancestor=fuzzy-disco_fuzzy-disco)",
     "build": "npm run clean; docker-compose build",
-    "deploy": "npm run clean; docker-compose up"
+    "deploy": "docker-compose up"
   },
   "author": "The Professors",
   "license": "ISC"
