@@ -1,0 +1,11 @@
+version: '2'
+services:
+  fuzzy-disco:
+    container_name: deploy
+    build: .
+    volumes:
+      - .:/usr/src/app
+      - $HOME/.aws:/root/.aws
+    environment:
+      AWS_PROFILE: mcr-codes
+      AWS_REGION: eu-west-1
