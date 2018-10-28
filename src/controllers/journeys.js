@@ -51,6 +51,7 @@ const find = (req, res) => Journey.findOne({ userId: req.authorizer.id, _id: req
               operator: departure.operator_name,
               status: departure.status,
               expectedDeparture: departure.expected_departure_time,
+              expectedArrival: departure.expected_arrival_time,
             },
           },
           alternateRoutes: alternate.data.routes.map(route => ({
