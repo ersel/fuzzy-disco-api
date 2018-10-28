@@ -38,23 +38,26 @@ module.exports.handler = async () => {
           return {
             to: user.expoPushToken,
             title: '⏰ Delayed Journey!',
-            body: `Your ${scheduledDepartureString} train from ${station} to ${stations.find(s => s.code === journey.end).name} is delayed. The new departure time is ${departure.expected_departure_time}`,
+            data: {
+              body: `Your ${scheduledDepartureString} train from ${station} to ${stations.find(s => s.code === journey.end).name} is delayed. The new departure time is ${departure.expected_departure_time}`,
+            },
           };
         }
 
         return {
           to: user.expoPushToken,
           title: '🚌 Rail Replacement Bus!',
-          body: `Your ${scheduledDepartureString} train from ${station} to ${stations.find(s => s.code === journey.end).name} has been replaced with a bus service!`,
+          data: {
+            body: `Your ${scheduledDepartureString} train from ${station} to ${stations.find(s => s.code === journey.end).name} has been replaced with a bus service!`,
+          },
         };
       }
       return null;
     }))
       .then(filterNulls)
       .then(sendNotifications);
-
-    return null;
   } catch (error) {
     console.log('ERROR:', JSON.stringify(error));
   }
+  return null;
 };
